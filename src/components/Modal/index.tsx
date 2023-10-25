@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { IFormField } from "../../models/formField";
+import { Spinner } from "../Spinner";
 
-export function Modal({ title, formFields, onSubmit }: IModalProps) {
+export function Modal({ title, formFields, isLoading, onSubmit }: IModalProps) {
   const [showModal, setShowModal] = useState(false);
   const { handleSubmit, register } = useForm();
 
@@ -24,7 +25,7 @@ export function Modal({ title, formFields, onSubmit }: IModalProps) {
         <>
           <div className="fixed inset-0 flex items-center justify-center z-50 outline-none focus:outline-none">
             <div className="relative w-auto my-6 mx-auto max-w-3xl">
-              <div className="border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none">
+              <div className=" shadow-lg border rounded-lg relative flex flex-col w-full bg-white outline-none focus:outline-none">
                 <header className="sticky flex align-center justify-between top-0 z-50 bg-white p-5 border-b border-solid border-gray-300 rounded-t">
                   <h3 className="text-3xl font-semibold">Create customer</h3>
                   <button
@@ -84,8 +85,9 @@ export function Modal({ title, formFields, onSubmit }: IModalProps) {
                     className="text-white bg-blue-700 active:bg-yellow-700 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1"
                     type="submit"
                     form="form"
+                    disabled={isLoading}
                   >
-                    Submit
+                    {!isLoading ? "Submit" : <Spinner size="6" />}
                   </button>
                 </footer>
               </div>
@@ -99,6 +101,7 @@ export function Modal({ title, formFields, onSubmit }: IModalProps) {
 
 interface IModalProps {
   title: string;
+  isLoading: boolean;
   formFields: IFormField[];
   onSubmit: (data: any) => void;
 }
