@@ -9,17 +9,29 @@
     ],
     "module": "ESNext",
     "skipLibCheck": true,
+    /* Node.js-like module resolution */
     "moduleResolution": "node",
-    "isolatedModules": true,
     "noEmit": true,
+    "resolveJsonModule": true,
     "jsx": "react-jsx",
+    /* Linting */
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+    /* Allow .tsx extensions */
+    "allowJs": true,
+    "esModuleInterop": true,
   },
   "include": [
-    "src"
+    "src",
+    "src/*.ts",
+    "src/*.tsx",
+    "src/**/*.ts",
+    "src/**/*.tsx",
+  ],
+  "exclude": [
+    "node_modules"
   ],
   "references": [
     {
