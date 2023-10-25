@@ -1,12 +1,12 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 
-import { Customer } from "./pages/customers";
+import { Customers } from "./pages/Customers";
 
 export function Router() {
   return (
     <Routes>
-      <Route path="/" element={<Navigate to="/dashboard" />} />
-      <Route path="/dashboard" element={<Customer />} />
+      <Route path="/" element={<Navigate to="/customers" />} />
+      <Route path="/customers" element={<Customers />} />
     </Routes>
   );
 }
