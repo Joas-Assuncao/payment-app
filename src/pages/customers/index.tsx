@@ -1,44 +1,87 @@
+import { AxiosResponse } from "axios";
+import { useMutation, useQuery } from "react-query";
+
 import { Modal } from "../../components/Modal";
+import { Spinner } from "../../components/Spinner";
 import { Table } from "../../components/Table";
-// import { apiService } from '../../services/axios';
-// import { useQuery } from 'react-query';
-// import { IFinancialTransaction } from '../../models/financialTransaction';
+import { apiService } from "../../services/axios";
+import { useQueryClient } from "react-query";
 
-export function Customer() {
-  // const { data, isFetching } = useQuery<IFinancialTransaction>(
-  //   'dashboard',
-  //   async () => {
-  //     try {
-  //       const response = await apiService({
-  //         method: 'GET',
-  //         url: '/financialTransactions',
-  //       });
+export function Customers() {
+  const queryClient = useQueryClient();
 
-  //       console.log(response.data);
+  const { data = { data: [], totalCount: 0 }, isFetching } = useQuery<IResults>(
+    ["customerslist"],
+    async () => {
+      try {
+        const response: AxiosResponse = await apiService({
+          method: "GET",
+          url: "/customers",
+        });
 
-  //       return response.data;
-  //     } catch (err) {
-  //       console.log({ err });
-  //     }
-  //   }
-  // );
-
-  // if (isFetching) return 'Loading...';
-
-  const dataSource = [
-    {
-      name: "joao",
-      email: "joao@mail.co",
-      type: "customer",
+        return response.data;
+      } catch (err) {
+        console.log({ err });
+      }
     },
     {
-      name: "claudio",
-      email: "claudio@mail.co",
-      type: "user",
+      refetchOnWindowFocus: false,
+    }
+  );
+
+  const { mutate, isLoading } = useMutation(
+    "createcustomer",
+    async (body: ICustomer) => {
+      try {
+        const response: AxiosResponse = await apiService({
+          method: "POST",
+          url: "/customers",
+          data: body,
+        });
+
+        return response;
+      } catch (err) {
+        console.log({ err });
+      }
     },
+    {
+      onSuccess: () => {
+        console.log("success");
+        queryClient.invalidateQueries("customerslist");
+      },
+      onError: () => {
+        console.log("error");
+      },
+    }
+  );
+
+  const columnsName = [
+    "dateCreated",
+    "name",
+    "email",
+    "mobilePhone",
+    "cpfCnpj",
+    "state",
   ];
 
-  const columnsName = ["name", "email", "type"];
+  const dataSource: any = [];
+
+  if (!isFetching) {
+    const customers = data.data;
+
+    const customersObjectToArray = customers.map((dataItem) =>
+      Object.entries(dataItem)
+    );
+
+    const customersObjectToArrayFiltered = customersObjectToArray.map(
+      (objectTransformedArray: string[][]) =>
+        objectTransformedArray.filter(([key]) => columnsName.includes(key))
+    );
+
+    customersObjectToArrayFiltered.forEach((item: string[][]) => {
+      dataSource.push(item);
+    });
+  }
 
   const formFields = [
     { fieldName: "name", label: "Name", type: "text", required: true },
@@ -115,12 +158,12 @@ export function Customer() {
   ];
 
   function onSubmit(body: any) {
-    console.log(body);
+    mutate(body);
   }
 
   return (
     <>
-      <div className="relative overflow-x-auto p-4">
+      <div className="relative p-4 ml-64">
         <header className="flex items-center justify-between">
           <h2 className="px-4 py-3 text-2xl font-bold leading-none tracking-tight text-gray-900 md:text-3xl lg:text-4xl">
             Customer
@@ -129,11 +172,24 @@ export function Customer() {
             title="Create customer"
             formFields={formFields}
             onSubmit={onSubmit}
+            isLoading={isLoading}
           />
         </header>
-        <div>
-          <Table columnsName={columnsName} dataSource={dataSource} />
-        </div>
+
+        {isFetching && (
+          <div className="flex justify-center">
+            <Spinner size="10" />
+          </div>
+        )}
+        {!isFetching && (
+          <div className="overflow-x-scroll w-full">
+            <Table
+              columnsName={columnsName}
+              dataSource={dataSource}
+              totalCount={data.totalCount}
+            />
+          </div>
+        )}
       </div>
     </>
   );
