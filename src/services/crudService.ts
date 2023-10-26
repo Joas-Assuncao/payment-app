@@ -32,11 +32,11 @@ export function crudService(endpoint: string) {
     }
   }
 
-  async function update(id: string, body: ICustomer): Promise<any> {
+  async function update(body: ICustomer): Promise<any> {
     try {
       const response: AxiosResponse = await apiService({
         method: "PUT",
-        url: `${endpoint}/${id}`,
+        url: `${endpoint}/${body.id}`,
         data: body,
       });
 
