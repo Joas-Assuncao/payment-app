@@ -17,9 +17,19 @@ export function Customers() {
     }
   );
 
-  const { mutate, isLoading } = useMutation(
+  const { mutate: createCustomer, isLoading: isLoadingCreate } = useMutation(
     "createcustomer",
     crudService("/customers").create,
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries("customerslist");
+      },
+    }
+  );
+
+  const { mutate: updateCustomer, isLoading: isLoadingUpdate } = useMutation(
+    "updatecustomer",
+    crudService("/customers").update,
     {
       onSuccess: () => {
         queryClient.invalidateQueries("customerslist");
@@ -48,7 +58,9 @@ export function Customers() {
 
     const customersObjectToArrayFiltered = customersObjectToArray.map(
       (objectTransformedArray: string[][]) =>
-        objectTransformedArray.filter(([key]) => columnsName.includes(key))
+        objectTransformedArray.filter(
+          ([key]) => columnsName.includes(key) || key === "id"
+        )
     );
 
     customersObjectToArrayFiltered.forEach((item: string[][]) => {
@@ -57,7 +69,12 @@ export function Customers() {
   }
 
   function onSubmit(body: any) {
-    mutate(body);
+    if (body.id) {
+      updateCustomer(body);
+      return;
+    }
+
+    createCustomer(body);
   }
 
   return (
@@ -71,7 +88,7 @@ export function Customers() {
             title="Create customer"
             formFields={formFields}
             onSubmit={onSubmit}
-            isLoading={isLoading}
+            isLoading={isLoadingCreate || isLoadingUpdate}
           />
         </header>
 
