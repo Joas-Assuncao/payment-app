@@ -1,5 +1,7 @@
+import { Toaster } from "react-hot-toast";
 import { QueryClientProvider } from "react-query";
 import { BrowserRouter } from "react-router-dom";
+
 import { Header } from "./components/Header";
 import { Sidebar } from "./components/Sidebar";
 import { Router } from "./routes";
@@ -12,6 +14,7 @@ function App() {
         <Header />
         <Sidebar />
         <Router />
+        <Toaster position="top-center" reverseOrder={false} />
       </BrowserRouter>
     </QueryClientProvider>
   );

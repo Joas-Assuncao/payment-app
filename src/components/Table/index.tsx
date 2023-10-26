@@ -1,6 +1,27 @@
 import { BiEditAlt } from "react-icons/bi";
+import { useMutation } from "react-query";
 
-export function Table({ columnsName, dataSource, totalCount }: TableProps) {
+import { formFields } from "../../pages/Customers/formFields";
+import { queryClient } from "../../services/queryClient";
+import { Modal } from "../Modal";
+
+export function Table({
+  columnsName,
+  dataSource,
+  totalCount,
+  type,
+  service,
+}: TableProps) {
+  const { mutate, isLoading } = useMutation("update" + type, service.update, {
+    onSuccess: () => {
+      queryClient.invalidateQueries(type + "slist");
+    },
+  });
+
+  function onSubmit(body: any) {
+    mutate(body);
+  }
+
   return (
     <>
       <table className="text-sm text-left text-gray-500">
@@ -14,24 +35,20 @@ export function Table({ columnsName, dataSource, totalCount }: TableProps) {
           </tr>
         </thead>
         <tbody>
-          {dataSource?.map((dataItem, index) => {
-            return (
-              <tr className="bg-white border-b" key={index}>
-                {dataItem.map(([, value], index) => (
-                  <>
-                    <td className="px-6 py-4" key={index}>
-                      {value}
-                    </td>
-                  </>
-                ))}
-                <td className="text-center">
-                  <button>
-                    <BiEditAlt />
-                  </button>
+          {dataSource?.map((dataItem, index) => (
+            <tr className="bg-white border-b" key={index}>
+              {dataItem.map(([, value], index) => (
+                <td className="px-6 py-4" key={index + "child"}>
+                  {value}
                 </td>
-              </tr>
-            );
-          })}
+              ))}
+              <td className="text-center">
+                <button>
+                  <BiEditAlt />
+                </button>
+              </td>
+            </tr>
+          ))}
         </tbody>
       </table>
 
@@ -89,6 +106,12 @@ export function Table({ columnsName, dataSource, totalCount }: TableProps) {
           </div>
         </>
       )}
+      <Modal
+        title="Create customer"
+        formFields={formFields}
+        onSubmit={onSubmit}
+        isLoading={isLoading}
+      />
     </>
   );
 }
@@ -97,4 +120,6 @@ interface TableProps {
   dataSource?: [string, string][][];
   columnsName?: string[];
   totalCount?: number;
+  type: string;
+  service: any;
 }
