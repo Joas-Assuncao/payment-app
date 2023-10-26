@@ -1,10 +1,16 @@
-export function Spinner({ size }: { size?: string }) {
+export function Spinner({
+  size,
+  className,
+}: {
+  size?: string;
+  className?: string;
+}) {
   const svgClassName = `w-${size || "8"} h-${
     size || "8"
   } text-gray-200 animate-spin dark:text-gray-600 fill-blue-600`;
 
   return (
-    <div role="status">
+    <div role="status" className={className}>
       <svg
         aria-hidden="true"
         className={svgClassName}

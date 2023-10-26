@@ -22,6 +22,18 @@ export function Table({
     mutate(body);
   }
 
+  function getId(dataItem: [string, string][]): string {
+    let id = "";
+
+    dataItem.forEach((item) => {
+      if (item[0] === "id") {
+        id = item[1];
+      }
+    });
+
+    return id;
+  }
+
   return (
     <>
       <table className="text-sm text-left text-gray-500">
@@ -37,15 +49,24 @@ export function Table({
         <tbody>
           {dataSource?.map((dataItem, index) => (
             <tr className="bg-white border-b" key={index}>
-              {dataItem.map(([, value], index) => (
-                <td className="px-6 py-4" key={index + "child"}>
-                  {value}
-                </td>
-              ))}
+              {dataItem.map(([key, value], index) => {
+                if (key === "id") return null;
+
+                return (
+                  <td className="px-6 py-4" key={index + "child"}>
+                    {value}
+                  </td>
+                );
+              })}
               <td className="text-center">
-                <button>
-                  <BiEditAlt />
-                </button>
+                <Modal
+                  Icon={BiEditAlt}
+                  title=""
+                  id={getId(dataItem)}
+                  formFields={formFields}
+                  onSubmit={onSubmit}
+                  isLoading={isLoading}
+                />
               </td>
             </tr>
           ))}
@@ -106,12 +127,6 @@ export function Table({
           </div>
         </>
       )}
-      <Modal
-        title="Create customer"
-        formFields={formFields}
-        onSubmit={onSubmit}
-        isLoading={isLoading}
-      />
     </>
   );
 }
