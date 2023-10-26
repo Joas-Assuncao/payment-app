@@ -1,29 +1,16 @@
-import { AxiosResponse } from "axios";
-import { useMutation, useQuery } from "react-query";
+import { useMutation, useQuery, useQueryClient } from "react-query";
 
 import { Modal } from "../../components/Modal";
 import { Spinner } from "../../components/Spinner";
 import { Table } from "../../components/Table";
-import { apiService } from "../../services/axios";
-import { useQueryClient } from "react-query";
+import { customerService } from "../../services/customerService";
 
 export function Customers() {
   const queryClient = useQueryClient();
 
   const { data = { data: [], totalCount: 0 }, isFetching } = useQuery<IResults>(
     ["customerslist"],
-    async () => {
-      try {
-        const response: AxiosResponse = await apiService({
-          method: "GET",
-          url: "/customers",
-        });
-
-        return response.data;
-      } catch (err) {
-        console.log({ err });
-      }
-    },
+    customerService.list,
     {
       refetchOnWindowFocus: false,
     }
@@ -31,22 +18,9 @@ export function Customers() {
 
   const { mutate, isLoading } = useMutation(
     "createcustomer",
-    async (body: ICustomer) => {
-      try {
-        const response: AxiosResponse = await apiService({
-          method: "POST",
-          url: "/customers",
-          data: body,
-        });
-
-        return response;
-      } catch (err) {
-        console.log({ err });
-      }
-    },
+    customerService.create,
     {
       onSuccess: () => {
-        console.log("success");
         queryClient.invalidateQueries("customerslist");
       },
       onError: () => {
@@ -62,6 +36,7 @@ export function Customers() {
     "mobilePhone",
     "cpfCnpj",
     "state",
+    "edit",
   ];
 
   const dataSource: any = [];
