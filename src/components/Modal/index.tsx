@@ -1,9 +1,17 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { IconType } from "react-icons/lib";
 import { IFormField } from "../../models/formField";
 import { Spinner } from "../Spinner";
 
-export function Modal({ title, formFields, isLoading, onSubmit }: IModalProps) {
+export function Modal({
+  title,
+  formFields,
+  isLoading,
+  id,
+  Icon,
+  onSubmit,
+}: IModalProps) {
   const [showModal, setShowModal] = useState(false);
   const { handleSubmit, register } = useForm();
 
@@ -14,13 +22,20 @@ export function Modal({ title, formFields, isLoading, onSubmit }: IModalProps) {
 
   return (
     <>
-      <button
-        className="block text-blue-700 bg-white border border-blue-700 hover:bg-blue-700 hover:text-white focus:ring-4 focus:outline-none focus:ring-blue-300 font-bold rounded-lg text-md px-5 py-2.5 text-center"
-        type="button"
-        onClick={() => setShowModal(true)}
-      >
-        {title}
-      </button>
+      {!id ? (
+        <button
+          className="block text-center text-blue-700 bg-white border border-blue-700 hover:bg-blue-700 hover:text-white focus:ring-4 focus:outline-none focus:ring-blue-300 font-bold rounded-lg text-md px-5 py-2.5 text-center"
+          type="button"
+          onClick={() => setShowModal(true)}
+        >
+          {title}
+        </button>
+      ) : (
+        <button type="button" onClick={() => setShowModal(true)}>
+          {Icon && <Icon />}
+        </button>
+      )}
+
       {showModal ? (
         <>
           <div className="fixed inset-0 flex items-center justify-center z-50 outline-none focus:outline-none">
@@ -103,5 +118,7 @@ interface IModalProps {
   title: string;
   isLoading: boolean;
   formFields: IFormField[];
+  id?: string;
+  Icon?: IconType;
   onSubmit: (data: any) => void;
 }
