@@ -1,3 +1,5 @@
+import { BiEditAlt } from "react-icons/bi";
+
 export function Table({ columnsName, dataSource, totalCount }: TableProps) {
   return (
     <>
@@ -16,10 +18,17 @@ export function Table({ columnsName, dataSource, totalCount }: TableProps) {
             return (
               <tr className="bg-white border-b" key={index}>
                 {dataItem.map(([, value], index) => (
-                  <td className="px-6 py-4" key={index}>
-                    {value}
-                  </td>
+                  <>
+                    <td className="px-6 py-4" key={index}>
+                      {value}
+                    </td>
+                  </>
                 ))}
+                <td className="text-center">
+                  <button>
+                    <BiEditAlt />
+                  </button>
+                </td>
               </tr>
             );
           })}
