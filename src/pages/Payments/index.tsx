@@ -1,80 +1,79 @@
 import { useMutation, useQuery, useQueryClient } from "react-query";
 
-import { Modal } from "../../components/Modal";
+import { PaymentModal } from "../../components/Modals/PaymentModal";
 import { Spinner } from "../../components/Spinner";
 import { Table } from "../../components/Table";
-import { crudService } from "../../services/crudService";
-import { formFields } from "./formFields";
+import { customerService } from "../../services/customerService";
 
-export function Customers() {
+export function Payments() {
   const queryClient = useQueryClient();
 
   const { data = { data: [], totalCount: 0 }, isFetching } = useQuery<IResults>(
-    ["customerslist"],
-    crudService("/customers").list,
+    ["paymentslist"],
+    customerService("/payments").list,
     {
       refetchOnWindowFocus: false,
     }
   );
 
-  const { mutate: createCustomer, isLoading: isLoadingCreate } = useMutation(
-    "createcustomer",
-    crudService("/customers").create,
+  const { mutate: createPayment, isLoading: isLoadingCreate } = useMutation(
+    "createpayments",
+    customerService("/payments").create,
     {
       onSuccess: () => {
-        queryClient.invalidateQueries("customerslist");
+        queryClient.invalidateQueries("paymentslist");
       },
     }
   );
 
-  const { mutate: updateCustomer, isLoading: isLoadingUpdate } = useMutation(
-    "updatecustomer",
-    crudService("/customers").update,
+  const { mutate: updatePayment, isLoading: isLoadingUpdate } = useMutation(
+    "updatepayments",
+    customerService("/paymentss").update,
     {
       onSuccess: () => {
-        queryClient.invalidateQueries("customerslist");
+        queryClient.invalidateQueries("paymentslist");
       },
     }
   );
 
   const columnsName = [
-    "dateCreated",
-    "name",
-    "email",
-    "mobilePhone",
-    "cpfCnpj",
-    "state",
+    "dueDate",
+    "value",
+    "netValue",
+    "billingType",
+    "status",
+    "description",
     "edit",
   ];
 
   const dataSource: any = [];
 
   if (!isFetching) {
-    const customers = data.data;
+    const paymentss = data.data;
 
-    const customersObjectToArray = customers.map((dataItem) =>
+    const paymentsObjectToArray = paymentss.map((dataItem) =>
       Object.entries(dataItem)
     );
 
-    const customersObjectToArrayFiltered = customersObjectToArray.map(
+    const paymentsObjectToArrayFiltered = paymentsObjectToArray.map(
       (objectTransformedArray: string[][]) =>
         objectTransformedArray.filter(
           ([key]) => columnsName.includes(key) || key === "id"
         )
     );
 
-    customersObjectToArrayFiltered.forEach((item: string[][]) => {
+    paymentsObjectToArrayFiltered.forEach((item: string[][]) => {
       dataSource.push(item);
     });
   }
 
   function onSubmit(body: any) {
     if (body.id) {
-      updateCustomer(body);
+      updatePayment(body);
       return;
     }
 
-    createCustomer(body);
+    createPayment(body);
   }
 
   return (
@@ -82,11 +81,10 @@ export function Customers() {
       <div className="relative p-4 ml-64">
         <header className="flex items-center justify-between">
           <h2 className="px-4 py-3 text-2xl font-bold leading-none tracking-tight text-gray-900 md:text-3xl lg:text-4xl">
-            Customer
+            Payments
           </h2>
-          <Modal
-            title="Create customer"
-            formFields={formFields}
+          <PaymentModal
+            title="Create payment"
             onSubmit={onSubmit}
             isLoading={isLoadingCreate || isLoadingUpdate}
           />
@@ -100,11 +98,12 @@ export function Customers() {
         {!isFetching && (
           <div className="overflow-x-scroll w-full">
             <Table
-              type="customer"
+              Modal={PaymentModal}
+              type="payments"
               columnsName={columnsName}
               dataSource={dataSource}
               totalCount={data.totalCount}
-              service={crudService("/customers")}
+              service={customerService("/payments")}
             />
           </div>
         )}
