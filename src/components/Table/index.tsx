@@ -1,39 +1,6 @@
-import { BiEditAlt } from "react-icons/bi";
-import { useMutation } from "react-query";
+import { EditCustomerModal } from "../Modals/EditCustomerModal";
 
-import { formFields } from "../../pages/Customers/formFields";
-import { queryClient } from "../../services/queryClient";
-import { Modal } from "../Modal";
-
-export function Table({
-  columnsName,
-  dataSource,
-  totalCount,
-  type,
-  service,
-}: TableProps) {
-  const { mutate, isLoading } = useMutation("update" + type, service.update, {
-    onSuccess: () => {
-      queryClient.invalidateQueries(type + "slist");
-    },
-  });
-
-  function onSubmit(body: any) {
-    mutate(body);
-  }
-
-  function getId(dataItem: [string, string][]): string {
-    let id = "";
-
-    dataItem.forEach((item) => {
-      if (item[0] === "id") {
-        id = item[1];
-      }
-    });
-
-    return id;
-  }
-
+export function Table({ columnsName, dataSource, totalCount }: TableProps) {
   return (
     <>
       <table className="text-sm text-left text-gray-500">
@@ -50,24 +17,20 @@ export function Table({
           {dataSource?.map((dataItem, index) => (
             <tr className="bg-white border-b" key={index}>
               {dataItem.map(([key, value], index) => {
-                if (key === "id") return null;
+                if (key === "id") {
+                  return (
+                    <td className="text-center" key={index}>
+                      <EditCustomerModal id={value} />
+                    </td>
+                  );
+                }
 
                 return (
-                  <td className="px-6 py-4" key={index + "child"}>
+                  <td className="px-6 py-4" key={index}>
                     {value}
                   </td>
                 );
               })}
-              <td className="text-center">
-                <Modal
-                  Icon={BiEditAlt}
-                  title=""
-                  id={getId(dataItem)}
-                  formFields={formFields}
-                  onSubmit={onSubmit}
-                  isLoading={isLoading}
-                />
-              </td>
             </tr>
           ))}
         </tbody>
@@ -135,6 +98,4 @@ interface TableProps {
   dataSource?: [string, string][][];
   columnsName?: string[];
   totalCount?: number;
-  type: string;
-  service: any;
 }
