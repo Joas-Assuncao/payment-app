@@ -37,13 +37,13 @@ export function Customers() {
   );
 
   const columnsName = [
+    "edit",
     "dateCreated",
     "name",
     "email",
     "mobilePhone",
     "cpfCnpj",
     "state",
-    "edit",
   ];
 
   const dataSource: any = [];

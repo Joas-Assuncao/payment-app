@@ -17,17 +17,17 @@ export function Table({ columnsName, dataSource, totalCount }: TableProps) {
           {dataSource?.map((dataItem, index) => (
             <tr className="bg-white border-b" key={index}>
               {dataItem.map(([key, value], index) => {
-                if (key === "id") {
+                if (key !== "id") {
                   return (
-                    <td className="text-center" key={index}>
-                      <EditCustomerModal id={value} />
+                    <td className="px-6 py-4" key={index}>
+                      {value}
                     </td>
                   );
                 }
 
                 return (
-                  <td className="px-6 py-4" key={index}>
-                    {value}
+                  <td className="text-center" key={index}>
+                    <EditCustomerModal id={value} />
                   </td>
                 );
               })}
