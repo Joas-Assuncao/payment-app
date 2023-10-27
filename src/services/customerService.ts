@@ -4,12 +4,25 @@ import { toast } from "react-hot-toast";
 import { IError } from "../models/Error";
 import { apiService } from "./axios";
 
-export function crudService(endpoint: string) {
-  async function list(): Promise<any> {
+export function customerService() {
+  async function listAll(): Promise<any> {
     try {
       const response: AxiosResponse = await apiService({
         method: "GET",
-        url: endpoint,
+        url: "/customers",
+      });
+
+      return response.data;
+    } catch (err: any) {
+      errorHandler(err.errors);
+    }
+  }
+
+  async function list(id: string): Promise<any> {
+    try {
+      const response: AxiosResponse = await apiService({
+        method: "GET",
+        url: `/customers/${id}`,
       });
 
       return response.data;
@@ -22,7 +35,7 @@ export function crudService(endpoint: string) {
     try {
       const response: AxiosResponse = await apiService({
         method: "POST",
-        url: endpoint,
+        url: "/customers",
         data: body,
       });
 
@@ -36,7 +49,7 @@ export function crudService(endpoint: string) {
     try {
       const response: AxiosResponse = await apiService({
         method: "PUT",
-        url: `${endpoint}/${body.id}`,
+        url: `/customers/${body.id}`,
         data: body,
       });
 
@@ -50,7 +63,7 @@ export function crudService(endpoint: string) {
     try {
       const response: AxiosResponse = await apiService({
         method: "DELETE",
-        url: `${endpoint}/${id}`,
+        url: `/customers/${id}`,
       });
 
       return response;
@@ -63,7 +76,7 @@ export function crudService(endpoint: string) {
     try {
       const response: AxiosResponse = await apiService({
         method: "PUT",
-        url: `${endpoint}/${id}/restore`,
+        url: `/customers/${id}/restore`,
       });
 
       return response;
@@ -79,6 +92,7 @@ export function crudService(endpoint: string) {
   }
 
   return {
+    listAll,
     list,
     create,
     update,

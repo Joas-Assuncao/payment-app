@@ -1,17 +1,16 @@
 import { useMutation, useQuery, useQueryClient } from "react-query";
 
-import { Modal } from "../../components/Modal";
+import { CustomerModal } from "../../components/Modals/CustomerModal";
 import { Spinner } from "../../components/Spinner";
 import { Table } from "../../components/Table";
-import { crudService } from "../../services/crudService";
-import { formFields } from "./formFields";
+import { customerService } from "../../services/customerService";
 
 export function Customers() {
   const queryClient = useQueryClient();
 
   const { data = { data: [], totalCount: 0 }, isFetching } = useQuery<IResults>(
     ["customerslist"],
-    crudService("/customers").list,
+    customerService().listAll,
     {
       refetchOnWindowFocus: false,
     }
@@ -19,7 +18,7 @@ export function Customers() {
 
   const { mutate: createCustomer, isLoading: isLoadingCreate } = useMutation(
     "createcustomer",
-    crudService("/customers").create,
+    customerService().create,
     {
       onSuccess: () => {
         queryClient.invalidateQueries("customerslist");
@@ -29,7 +28,7 @@ export function Customers() {
 
   const { mutate: updateCustomer, isLoading: isLoadingUpdate } = useMutation(
     "updatecustomer",
-    crudService("/customers").update,
+    customerService().update,
     {
       onSuccess: () => {
         queryClient.invalidateQueries("customerslist");
@@ -84,9 +83,8 @@ export function Customers() {
           <h2 className="px-4 py-3 text-2xl font-bold leading-none tracking-tight text-gray-900 md:text-3xl lg:text-4xl">
             Customer
           </h2>
-          <Modal
+          <CustomerModal
             title="Create customer"
-            formFields={formFields}
             onSubmit={onSubmit}
             isLoading={isLoadingCreate || isLoadingUpdate}
           />
@@ -100,11 +98,9 @@ export function Customers() {
         {!isFetching && (
           <div className="overflow-x-scroll w-full">
             <Table
-              type="customer"
               columnsName={columnsName}
               dataSource={dataSource}
               totalCount={data.totalCount}
-              service={crudService("/customers")}
             />
           </div>
         )}
