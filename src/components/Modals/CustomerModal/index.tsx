@@ -1,40 +1,48 @@
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { IconType } from "react-icons/lib";
-import { IFormField } from "../../models/formField";
-import { Spinner } from "../Spinner";
+import { zodResolver } from "@hookform/resolvers/zod";
 
-export function Modal({
-  title,
-  formFields,
-  isLoading,
-  id,
-  Icon,
-  onSubmit,
-}: IModalProps) {
+import {
+  FormDataCustomer,
+  schemaCustomer,
+} from "../schemas/customerFormFields";
+import { Spinner } from "../../Spinner";
+import { Input } from "../../Input";
+import { Checkbox } from "../../Checkbox";
+import { MdClose } from "react-icons/md";
+
+export function CustomerModal({ title, isLoading, onSubmit }: IModalProps) {
   const [showModal, setShowModal] = useState(false);
-  const { handleSubmit, register } = useForm();
+  const {
+    handleSubmit,
+    control,
+    register,
+    reset,
+    formState: { errors },
+  } = useForm<FormDataCustomer>({
+    resolver: zodResolver(schemaCustomer),
+  });
 
   function handleClickSubmit(body: any) {
     onSubmit(body);
     setShowModal(false);
+    reset();
   }
+
+  const formFields = Object.keys(
+    schemaCustomer.shape
+  ) as (keyof FormDataCustomer)[];
 
   return (
     <>
-      {!id ? (
-        <button
-          className="block text-center text-blue-700 bg-white border border-blue-700 hover:bg-blue-700 hover:text-white focus:ring-4 focus:outline-none focus:ring-blue-300 font-bold rounded-lg text-md px-5 py-2.5 text-center"
-          type="button"
-          onClick={() => setShowModal(true)}
-        >
-          {title}
-        </button>
-      ) : (
-        <button type="button" onClick={() => setShowModal(true)}>
-          {Icon && <Icon />}
-        </button>
-      )}
+      <button
+        className="block text-center text-blue-700 bg-white border border-blue-700 hover:bg-blue-700 hover:text-white focus:ring-4 focus:outline-none focus:ring-blue-300 font-bold rounded-lg text-md px-5 py-2.5 text-center"
+        type="button"
+        onClick={() => setShowModal(true)}
+      >
+        {title}
+      </button>
 
       {showModal ? (
         <>
@@ -45,10 +53,13 @@ export function Modal({
                   <h3 className="text-3xl font-semibold">Create customer</h3>
                   <button
                     className="bg-transparent border-0 text-black float-right"
-                    onClick={() => setShowModal(false)}
+                    onClick={() => {
+                      reset();
+                      setShowModal(false);
+                    }}
                   >
                     <span className="text-black opacity-7 h-6 w-6 text-xl block py-0 rounded-full">
-                      x
+                      <MdClose />
                     </span>
                   </button>
                 </header>
@@ -59,32 +70,34 @@ export function Modal({
                       className="grid grid-cols-2 gap-4 scroll bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4"
                       onSubmit={handleSubmit(handleClickSubmit)}
                     >
-                      {formFields.map((formField) => (
-                        <div className="mb-4" key={formField.fieldName}>
-                          <label
-                            htmlFor={formField.fieldName}
-                            className="block text-gray-700 text-sm font-bold mb-2"
-                          >
-                            {formField.label} {formField.required && "*"}
-                          </label>
-                          {formField.type === "boolean" ? (
-                            <input
-                              type="checkbox"
-                              id={formField.fieldName}
-                              className="form-checkbox h-5 w-5 text-blue-600"
-                              {...register(formField.fieldName)}
+                      {formFields.map((fieldName) => {
+                        if (fieldName === "notificationDisabled") {
+                          return (
+                            <Controller
+                              key={fieldName}
+                              control={control}
+                              name={fieldName}
+                              defaultValue={false}
+                              render={({ field: { onChange, value } }) => (
+                                <Checkbox
+                                  name={fieldName}
+                                  onChange={onChange}
+                                  value={value}
+                                />
+                              )}
                             />
-                          ) : (
-                            <input
-                              type="text"
-                              id={formField.fieldName}
-                              {...register(formField.fieldName)}
-                              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                              placeholder={`Your ${formField.label}`}
+                          );
+                        }
+
+                        return (
+                          <div className="mb-4" key={fieldName}>
+                            <Input
+                              {...register(fieldName)}
+                              error={errors[fieldName]?.message}
                             />
-                          )}
-                        </div>
-                      ))}
+                          </div>
+                        );
+                      })}
                     </form>
                   </div>
                 </div>
@@ -117,7 +130,6 @@ export function Modal({
 interface IModalProps {
   title: string;
   isLoading: boolean;
-  formFields: IFormField[];
   id?: string;
   Icon?: IconType;
   onSubmit: (data: any) => void;

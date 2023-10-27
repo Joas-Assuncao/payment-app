@@ -1,13 +1,8 @@
-import { useQuery } from "react-query";
-import { IFinanceBalance } from "../../models/financeBalance";
-import { crudService } from "../../services/crudService";
+import { useGetFinanceBalance } from "../../hooks/useFinance";
 import { Spinner } from "../Spinner";
 
 export function Header() {
-  const { data, isFetching } = useQuery<IFinanceBalance>(
-    ["financebalance"],
-    crudService("/finance/balance").list
-  );
+  const { data, isFetching } = useGetFinanceBalance();
 
   return (
     <header>
