@@ -50,11 +50,6 @@ export function EditCustomerModal({ id }: IModalProps) {
     schemaCustomer.shape
   ) as (keyof FormDataCustomer)[];
 
-  if (!data) {
-    setShowModal(false);
-    return null;
-  }
-
   return (
     <>
       <button type="button" onClick={() => setShowModal(true)}>
@@ -110,7 +105,7 @@ export function EditCustomerModal({ id }: IModalProps) {
                           return (
                             <div className="mb-4" key={fieldName}>
                               <Input
-                                defaultValue={data[fieldName]}
+                                defaultValue={data && data[fieldName]}
                                 {...register(fieldName)}
                                 error={errors && errors[fieldName]?.message}
                               />
